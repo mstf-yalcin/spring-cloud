@@ -1,0 +1,106 @@
+services:
+
+  accountdb:
+    image: postgres
+    container_name: accountdb
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: testdb
+    extends:
+      file: common-config.yml
+      service: network-deploy-service
+    healthcheck:
+      test: "pg_isready -U root -d testdb"
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    hostname: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    extends:
+      file: common-config.yml
+      service: network-deploy-service
+    healthcheck:
+      test: rabbitmq-diagnostics check_port_connectivity
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+  config-server:
+    image: config-server:v1
+    ports:
+      - "8071:8071"
+    environment:
+      SPRING_APPLICATION_NAME: config-server
+    extends:
+      file: common-config.yml
+      service: microservice-base-config
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      accountdb:
+        condition: service_healthy
+    healthcheck:
+      test: "curl --fail --silent localhost:8071/actuator/health/readiness | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  accounts:
+    image: accounts:v1
+    container_name: accounts-ms
+    ports:
+      - "8080:8080"
+    extends:
+      file: common-config.yml
+      service: microservice-config-server-config
+    environment:
+      SPRING_APPLICATION_NAME: accounts
+      SPRING_DATASOURCE_URL: jdbc:postgresql://accountdb:5432/testdb
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+    depends_on:
+      config-server:
+        condition: service_healthy
+      accountdb:
+        condition: service_healthy
+
+  loans:
+    image: loans:v1
+    ports:
+      - "8090:8090"
+    extends:
+      file: common-config.yml
+      service: microservice-config-server-config
+    environment:
+      SPRING_APPLICATION_NAME: loans
+    depends_on:
+      config-server:
+        condition: service_healthy
+
+  cards:
+    image: cards:v1
+    ports:
+    - "9000:9000"
+    extends:
+      file: common-config.yml
+      service: microservice-config-server-config
+    environment:
+      SPRING_APPLICATION_NAME: cards
+    depends_on:
+      config-server:
+        condition: service_healthy
+
+networks:
+  test-network:
+    driver: bridge

@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: accounts
+  profiles:
+    active: prod
+  config:
+    import: optional:configserver:http://localhost:8071/
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+#  datasource:
+#    url: jdbc:postgresql://localhost:5432/testdb
+#    username: root
+#    password: root
+#  jpa:
+#    hibernate:
+#      ddl-auto: update
+#  sql:
+#    init:
+#      mode: always
+server:
+  port:8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

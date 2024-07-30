@@ -1,0 +1,25 @@
+version : '3.8'
+
+services:
+  network-deploy-service:
+    networks:
+      - test-network
+
+  microservice-base-config:
+    extends:
+      service: network-deploy-service
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    environment:
+      SPRING_RABBITMQ_HOST: rabbitmq
+
+  microservice-config-server-config:
+    extends:
+      service: microservice-base-config
+    environment:
+      SPRING_PROFILES_ACTIVE: default
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8071/
+
+
