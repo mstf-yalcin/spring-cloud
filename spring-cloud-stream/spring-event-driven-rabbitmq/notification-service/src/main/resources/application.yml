@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: notification-service
+  cloud:
+    function:
+      definition: email|sms
+    stream:
+      bindings:
+        emailsms-in-0:  #  input channel default -> defination name-in-0 for input
+          destination: send-email-sms # exchange and queue name
+          group: ${spring.application.name} # destination.groupname = queue name
+        emailsms-out-0:
+          destination: communication-sent
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    connection-timeout: 10s
+
+server:
+  port: 9010
