@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: loans
+  cloud:
+    kubernetes:
+      discovery:
+        all-namespaces: true
+  config:
+    import: optional:configserver:http://localhost:8071/
+server:
+  port: 8090
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  health:
+    liveness-state:
+      enabled: true
+    readiness-state:
+      enabled: true
+  endpoint:
+    shutdown:
+      enabled: true
+    health:
+      probes:
+        enabled: true
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: loans
+    description: Loans Service
+    version: 1.0.0
+  build:
+    version: 1.0.0
+    time: 2021-07-01T12:00:00Z

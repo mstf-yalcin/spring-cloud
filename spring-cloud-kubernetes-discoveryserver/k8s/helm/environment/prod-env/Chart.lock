@@ -1,0 +1,24 @@
+dependencies:
+- name: common
+  repository: file://../../common
+  version: 0.1.0
+- name: config-server
+  repository: file://../../services/config-server
+  version: 0.1.0
+- name: accounts
+  repository: file://../../services/accounts
+  version: 0.1.0
+- name: cards
+  repository: file://../../services/cards
+  version: 0.1.0
+- name: loans
+  repository: file://../../services/loans
+  version: 0.1.0
+- name: gateway-server
+  repository: file://../../services/gateway-server
+  version: 0.1.0
+- name: notification-service
+  repository: file://../../services/notification-service
+  version: 0.1.0
+digest: sha256:fca00f1f6d2960947424ddd10533beff3b47143d8d410827a7ad8ce28244a497
+generated: "2024-08-11T17:45:36.2058264+03:00"
